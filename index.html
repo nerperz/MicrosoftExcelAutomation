@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <title>Excel Automation</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="./manifest.json">
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(() => console.log('✅ Service Worker registered'))
+      .catch(err => console.error('❌ Service Worker registration failed:', err));
+  }
+  </script>
 </head>
 <body>
   <h2><u>Welcome To The Website!</u></h2>
