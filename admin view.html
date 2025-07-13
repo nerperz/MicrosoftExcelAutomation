@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+  const ADMIN_PASSCODE = "1234";  // Change this to your secret
+
+  const entered = prompt("Enter admin passcode:");
+  if (entered !== ADMIN_PASSCODE) {
+    alert("❌ Incorrect passcode! Redirecting to homepage.");
+    window.location.href = "index.html";
+  } else {
+    console.log("✅ Admin passcode accepted.");
+  }
+</script>
+
+  <h2>Admin Panel</h2>
+  <p>Type a student's name exactly and add or deduct credits:</p>
+
+  <label for="studentName">Student Name:</label><br>
+  <input type="text" id="studentName" placeholder="e.g., Caguicla, Enzo Acar"><br>
+
+  <label for="amount">Credits to Add (+) or Deduct (-):</label><br>
+  <input type="number" id="amount" placeholder="e.g., 10 or -5"><br>
+
+  <button onclick="updateCredits()">Update Credits</button>
+  <button onclick="downloadLogs()">Download Orders (CSV)</button>
+  <button onclick="clearLogs()">Clear Logs</button>
+
+
+  <div id="result"></div>
+
+  <script>
+    function updateCredits() {
+      const inputName = document.getElementById('studentName').value.trim();
+      const amount = parseInt(document.getElementById('amount').value, 10);
+      const resultDiv = document.getElementById('result');
+
+      if (!inputName || isNaN(amount)) {
+        resultDiv.textContent = "❗ Please enter a valid name and number.";
+        resultDiv.style.color = "red";
+        console.log(`❌ Admin update failed: Invalid input (Name: ${inputName}, Amount: ${amount})`);
+        return;
+      }
+
+      let students = JSON.parse(localStorage.getItem('students') || '{}');
+      const matchedKey = Object.keys(students).find(name => name.toLowerCase() === inputName.toLowerCase());
+
+      if (!matchedKey) {
+        resultDiv.textContent = `❌ Student "${inputName}" not found.`;
+        resultDiv.style.color = "red";
+        console.log(`❌ Admin update failed: Student "${inputName}" not found in students.`);
+        console.log("Current students:", students);
+        return;
+      }
+
+      students[matchedKey] += amount;
+      if (students[matchedKey] < 0) students[matchedKey] = 0;
+
+      localStorage.setItem('students', JSON.stringify(students));
+      resultDiv.textContent = `✅ ${matchedKey} now has ${students[matchedKey]} credits.`;
+      resultDiv.style.color = "green";
+      console.log(`✅ Admin updated: ${matchedKey}, New Credits: ${students[matchedKey]}`);
+    }
+
+    function downloadLogs() {
+  const logs = JSON.parse(localStorage.getItem('purchaseLogs') || '[]');
+  if (!logs.length) {
+    alert("❗ No purchase logs found.");
+    return;
+  }
+
+  const headers = ["Name", "Date", "Item", "Price", "Remaining Credits"];
+  const rows = logs.map(log => [log.name, log.date, log.item, log.price, log.remainingCredits]);
+
+  let csvContent = headers.join(",") + "\n";
+  rows.forEach(r => {
+    csvContent += r.map(field => `"${field}"`).join(",") + "\n";
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "purchase_logs.csv");
+  link.click();
+
+  console.log("✅ Purchase logs downloaded as CSV.");
+}
+
+  function clearLogs() {
+  localStorage.removeItem('purchaseLogs');
+  alert("✅ Purchase logs cleared.");
+  console.log("🗑️ Purchase logs cleared from localStorage.");
+}
+  </script>
+</body>
+</html>

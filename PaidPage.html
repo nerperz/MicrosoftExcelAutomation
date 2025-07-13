@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Excel Automation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2><u>Thank You For Buying!</u></h2>
+  <h4><u>Your order has been successfully placed.</u></h4>
+
+  <form action="index.html">
+    <p>NEW REMAINING CREDITS: <span id="confirmCredits"></span></p>
+    <p class="confirmation-field">Name: <span id="confirmName"></span></p>
+    <p class="confirmation-field">Date: <span id="confirmDate"></span></p>
+    <p class="confirmation-field">Items: <span id="confirmItem"></span></p>
+    <button type="submit">BUY AGAIN?</button>
+  </form>
+
+  <script>
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param) || '';
+    }
+
+    const name = getQueryParam('name');
+    const date = getQueryParam('date');
+    const item = getQueryParam('item');
+    const credits = getQueryParam('credits');
+
+    document.getElementById('confirmName').textContent = name;
+    document.getElementById('confirmDate').textContent = date;
+    document.getElementById('confirmItem').textContent = item;
+    document.getElementById('confirmCredits').textContent = credits;
+
+    console.log(`✔️ Paid Page Loaded: Name: ${name}, New Credits: ${credits}, Item: ${item}, Date: ${date}`);
+  </script>
+</body>
+</html>

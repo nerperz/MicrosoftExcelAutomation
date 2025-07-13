@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Excel Automation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2><u>Welcome To The Website!</u></h2>
+  <h4><u>Please confirm the information you inserted to successfully place your order.</u></h4>
+  
+  <div>
+    <p>CREDITS BEFORE PAYMENT: <span id="confirmCredits"></span></p>
+    <p class="confirmation-field">Name: <span id="confirmName"></span></p>
+    <p class="confirmation-field">Date: <span id="confirmDate"></span></p>
+    <p class="confirmation-field">Items: <span id="confirmItem"></span></p>
+    <button id="confirmButton">CONFIRM AND PAY</button>
+  </div>
+
+  <script>
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param) || '';
+    }
+
+    const name = getQueryParam('name');
+    const date = getQueryParam('date');
+    const item = getQueryParam('item');
+    let credits = parseInt(getQueryParam('credits') || '0', 10);
+
+    document.getElementById('confirmName').textContent = name;
+    document.getElementById('confirmDate').textContent = date;
+    document.getElementById('confirmItem').textContent = item;
+    document.getElementById('confirmCredits').textContent = credits;
+
+    console.log(`✔️ Confirmation page loaded: Name: ${name}, Credits: ${credits}, Item: ${item}, Date: ${date}`);
+
+    const prices = {
+      'fudgebar': 10,
+      'null2': 15
+    };
+
+    document.getElementById('confirmButton').addEventListener('click', () => {
+      let students = JSON.parse(localStorage.getItem('students') || '{}');
+
+      const matchedKey = Object.keys(students).find(n => n.toLowerCase() === name.toLowerCase());
+      if (!matchedKey) {
+        alert(`Student "${name}" not found in records!`);
+        return;
+      }
+
+      const price = prices[item] || 0;
+      const oldCredits = students[matchedKey];
+      let newCredits = oldCredits - price;
+      if (newCredits < 0) newCredits = 0;
+
+      students[matchedKey] = newCredits;
+      localStorage.setItem('students', JSON.stringify(students));
+
+      // Log the transaction
+      const logs = JSON.parse(localStorage.getItem('purchaseLogs') || '[]');
+      logs.push({
+        name: matchedKey,
+        date,
+        item,
+        price,
+        oldCredits,
+        remainingCredits: newCredits
+});
+
+      localStorage.setItem('purchaseLogs', JSON.stringify(logs));
+
+      console.log(`✅ Payment confirmed: ${matchedKey}, Old Credits: ${oldCredits}, New Credits: ${newCredits}`);
+
+      // Redirect to PaidPage with final credits in URL
+      const url = `PaidPage.html?name=${encodeURIComponent(name)}&date=${encodeURIComponent(date)}&item=${encodeURIComponent(item)}&credits=${encodeURIComponent(newCredits)}`;
+      window.location.href = url;
+    });
+  </script>
+</body>
+</html>

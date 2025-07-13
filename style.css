@@ -1,0 +1,173 @@
+/* All things here was made by w.wowsers a.k.a Enzo, enhanced by Grok 3 */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(
+        135deg,
+        #000 0%,
+        #000957 30%,
+        #001d3d 60%,
+        #344CB7 100%
+    );
+    font-family: 'Times New Roman', Times, serif;
+    color: #577BC1;
+}
+
+#divform, form {
+    background-color: rgba(0, 9, 87, 0.5);
+    border: 2px solid #577BC1;
+    border-radius: 15px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    color: #b4cdff;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+button {
+    background-color: #000957;
+    color: #b4cdff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    padding: 12px 24px;
+    margin: 15px auto;
+    border: 1px solid #577BC1;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #001d3d;
+    transform: translateY(-2px);
+}
+
+h2, h4 {
+    text-align: center;
+    color: #577BC1;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 28px;
+}
+
+h4 {
+    font-size: 20px;
+}
+
+p {
+    color: #b4cdff;
+    font-size: 20px;
+    text-align: center;
+    margin: 0 0 20px;
+}
+
+label {
+    font-size: 18px;
+    display: block;
+    margin: 15px 0 5px;
+    color: #b4cdff;
+}
+
+.name, .date, select {
+    background-color: #000957;
+    color: #b4cdff;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #577BC1;
+    border-radius: 8px;
+    margin: 5px 0;
+}
+
+input::placeholder {
+    color: #8298d8;
+    opacity: 0.8;
+}
+
+#roleChoice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#studentSection {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#studentName, #amount {
+    background-color: #000957;
+    color: #b4cdff;
+    border: 1px solid #577BC1;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 15px;
+    }
+
+    .divform, .studentSection, form {
+        padding: 10px;
+        width: 95%;
+        max-width: 500px;
+        margin: 10px auto;
+        font-size: 15px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h4 {
+        font-size: 18px;
+    }
+
+    p {
+        font-size: 18px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    button {
+        font-size: 15px;
+        padding: 10px 20px;
+    }
+
+    .name, .date, select {
+        font-size: 15px;
+        padding: 8px;
+    }
+
+    #studentName, #amount {
+        font-size: 15px;
+        padding: 8px;
+    }
+}

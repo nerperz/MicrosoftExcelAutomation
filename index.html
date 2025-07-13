@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Excel Automation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2><u>Welcome To The Website!</u></h2>
+
+  <div id="roleChoice">
+    <h4>Please select your role:</h4>
+    <button onclick="showStudent()">I am a Student</button>
+    <button onclick="goAdmin()">I am an Admin</button>
+  </div>
+
+  <div id="studentSection" name="studentSection" style="display:none;">
+    <h4><u>Please Insert the needed information to confirm your payment.</u></h4>
+    <form>
+      <p id="creditsLine" style="display:none;">
+        Credits: <span id="creditsDisplay"></span>
+      </p>
+      <label class="Name">Name:</label>
+      <input name="name" class="name" required placeholder="Last Name, First Name, M.I"><br>
+      <label for="Date">Date:</label>
+      <input class="date" id="date" name="date" type="date" required placeholder="July 7, 2025"><br>
+      <label for="items">Items:</label>
+      <select class="item" name="item" id="itemsid" required>
+        <option value="">Nothing to buy...</option>
+        <option value="fudgebar">fudgebar - 10 credits</option>
+        <option value="null2">null2 - 15 credits</option>
+      </select><br>
+      <button type="submit">SUBMIT</button>
+    </form>
+  </div>
+
+  <script>
+    const initialStudents = {
+      "Andrade, Juneas Vladimir Anton": 0,
+      "Bantiles, John Earthsean": 0,
+      "Caboboy, Dwy Bron": 0,
+      "Caguicla, Enzo Acar": 0,
+      "Calcabin, Markki Johann": 0,
+      "Calubay, Jan Nino Rey": 0,
+      "Carlos, Jayhan": 0,
+      "Chiquillo, Cobby Kyle": 0,
+      "Homerez, Aldin Paul": 0,
+      "Lopera, Rayne": 0,
+      "Loyola, Xyriek": 0,
+      "Montajes, Matt Chister": 0,
+      "Montano, Kier Rudolf": 0,
+      "Raymundo, Nathan Lourwil": 0,
+      "Rocabo, Rhenard Daniel": 0,
+      "Sabit, March Leonard": 0,
+      "Sabong, Matthew Myer": 0,
+      "Segura, Gaddiel": 0,
+      "Tagra, Ryan Kenver": 0,
+      "Abadiano, Ela": 0,
+      "Abina, Yanni Myles": 0,
+      "Amarado, Elisha Angel": 0,
+      "Bacasno, Wince Melody": 0,
+      "Bautista, Esther Joy": 0,
+      "Borrega, Raine Alliyah": 0,
+      "Cayas, Keana Margarett": 0,
+      "Cordeta, Kate Ashley": 0,
+      "Dolor, Audrey Erl": 0,
+      "Elcarte, Rhiana Belle": 0,
+      "Fabi, Chevah": 0,
+      "Maraya, Muff Stacey": 0,
+      "Martin, Jeanie Khayte": 0,
+      "Oclinaria, Rhian Venice": 0,
+      "Redoblado, Jorden Adeline": 0,
+      "Relador, Cacey Isabelle": 0,
+      "Rosallosa, Zhekinah Shannel": 0,
+      "Siguan, Andi Therese": 0,
+      "Tablate, Lexine Jeanne": 0,
+      "Toreno, Tifa Aeouinne": 0
+    };
+
+const students = JSON.parse(localStorage.getItem('students') || '{}');
+const validNames = Object.keys(initialStudents);
+let hasInvalidKeys = false;
+Object.keys(students).forEach(key => {
+  if (!validNames.includes(key)) {
+    console.warn(`⚠️ Invalid student key in localStorage: "${key}"`);
+    hasInvalidKeys = true;
+  }
+});
+if (hasInvalidKeys) {
+  console.warn("⚠️ localStorage contains invalid keys. Consider resetting it.");
+}
+
+    const existingStudents = localStorage.getItem('students');
+    if (!existingStudents) {
+      localStorage.setItem('students', JSON.stringify(initialStudents));
+      console.log("✔️ Students initialized automatically with 0 credits each.");
+    } else {
+      console.log("✔️ Students already exist in localStorage.");
+      console.log("Current students:", JSON.parse(existingStudents));
+    }
+
+    function showStudent() {
+      document.getElementById('roleChoice').style.display = 'none';
+      document.getElementById('studentSection').style.display = 'block';
+      loadCredits();
+    }
+
+    function goAdmin() {
+      window.location.href = 'admin view.html';
+    }
+
+    function loadCredits() {
+      let studentName = localStorage.getItem('currentStudent');
+      if (!studentName) return;
+
+      let students = JSON.parse(localStorage.getItem('students') || '{}');
+      let matchedKey = Object.keys(students).find(name => name.toLowerCase() === studentName.toLowerCase());
+      if (matchedKey) {
+        document.getElementById('creditsDisplay').textContent = students[matchedKey];
+        document.getElementById('creditsLine').style.display = 'block';
+      }
+    }
+
+    const prices = {
+      'fudgebar': 10,
+      'null2': 15
+    };
+
+  document.querySelector('form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const name = form.querySelector('[name="name"]').value.trim();
+  const date = form.querySelector('[name="date"]').value;
+  const item = form.querySelector('[name="item"]').value;
+
+  let students = JSON.parse(localStorage.getItem('students') || '{}');
+  const matchedKey = Object.keys(students).find(n => n.toLowerCase() === name.toLowerCase());
+
+  if (!matchedKey) {
+    alert(`Student "${name}" not found! Please enter a valid student name.`);
+    return;
+  }
+
+  localStorage.setItem('currentStudent', matchedKey);
+
+  const currentCredits = students[matchedKey];
+
+  window.location.href = `student view.html?name=${encodeURIComponent(matchedKey)}&date=${encodeURIComponent(date)}&item=${encodeURIComponent(item)}&credits=${currentCredits}`;
+});
+
+
+    const nameInput = document.querySelector('input[name="name"]');
+    const creditsLine = document.getElementById('creditsLine');
+    const creditsDisplay = document.getElementById('creditsDisplay');
+
+    nameInput.addEventListener('blur', () => {
+      const typedName = nameInput.value.trim();
+      if (!typedName) {
+        creditsLine.style.display = 'none';
+        return;
+      }
+
+      let students = JSON.parse(localStorage.getItem('students') || '{}');
+      const matchedKey = Object.keys(students).find(name => name.toLowerCase() === typedName.toLowerCase());
+
+      if (matchedKey) {
+        creditsDisplay.textContent = students[matchedKey];
+        creditsLine.style.display = 'block';
+        console.log(`✔️ Found student: ${matchedKey}, Credits: ${students[matchedKey]}`);
+      } else {
+        creditsDisplay.textContent = "Not found!";
+        creditsLine.style.display = 'block';
+        console.log(`❌ Student not found: ${typedName}`);
+      }
+    });
+  </script>
+</body>
+</html>
