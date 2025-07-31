@@ -41,6 +41,27 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+self.addEventListener('fetch', function(event) {
+  const url = new URL(event.request.url);
+
+  // Handle requests to studentview.html with query params
+  if (url.pathname.endsWith('studentview.html')) {
+    event.respondWith(
+      caches.match('/studentview.html').then(function(response) {
+        return response || fetch(event.request);
+      })
+    );
+    return;
+  }
+
+  // Default handler
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    })
+  );
+});
+
 // FETCH: Serve from cache, or fallback safely
 self.addEventListener('fetch', event => {
   event.respondWith(
