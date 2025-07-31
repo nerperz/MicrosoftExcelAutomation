@@ -7,8 +7,8 @@ const urlsToCache = [
   `${BASE_PATH}/style.css`,
   `${BASE_PATH}/script.js`,
   `${BASE_PATH}/manifest.json`,
-  `${BASE_PATH}/student-view.html`,
-  `${BASE_PATH}/admin-view.html`,
+  `${BASE_PATH}/studentview.html`,
+  `${BASE_PATH}/adminview.html`,
   `${BASE_PATH}/PaidPage.html`,
   `${BASE_PATH}/icon-192.png`,
   `${BASE_PATH}/icon-512.png`
