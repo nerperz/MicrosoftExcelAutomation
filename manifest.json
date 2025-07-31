@@ -1,0 +1,8 @@
+{
+  "name": "Excel Automation",
+  "short_name": "ExcelApp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000957"
+}
