@@ -39,16 +39,17 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
-    }).catch(error => {
-      console.error('Fetch failed; returning offline fallback.', error);
+    }).catch(async error => {
+      console.error('Fetch failed:', error);
 
-      // Fallback: return index.html only for HTML page requests
+      // Check if it's an HTML page request
       if (event.request.headers.get('accept')?.includes('text/html')) {
-        return caches.match(`${BASE_PATH}/index.html`);
+        const fallback = await caches.match(`${BASE_PATH}/index.html`);
+        if (fallback) return fallback;
       }
 
-      // Generic fallback
-      return new Response('Offline and no cache found.', {
+      // Generic fallback Response
+      return new Response('Offline and resource not cached.', {
         status: 503,
         statusText: 'Offline',
         headers: { 'Content-Type': 'text/plain' }
@@ -56,3 +57,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
