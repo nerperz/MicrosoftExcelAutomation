@@ -14,6 +14,7 @@ const urlsToCache = [
   `${BASE_PATH}/icon-512.png`
 ];
 
+// INSTALL
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -22,6 +23,7 @@ self.addEventListener('install', event => {
   );
 });
 
+// ACTIVATE
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -32,15 +34,25 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('fetch', event => {
+// FETCH
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
     }).catch(error => {
-      // Optionally log or show fallback content
       console.error('Fetch failed; returning offline fallback.', error);
-      return caches.match(`${BASE_PATH}/index.html`);
+
+      // Fallback: return index.html only for HTML page requests
+      if (event.request.headers.get('accept')?.includes('text/html')) {
+        return caches.match(`${BASE_PATH}/index.html`);
+      }
+
+      // Generic fallback
+      return new Response('Offline and no cache found.', {
+        status: 503,
+        statusText: 'Offline',
+        headers: { 'Content-Type': 'text/plain' }
+      });
     })
   );
 });
