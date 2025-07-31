@@ -30,8 +30,14 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    }).catch(error => {
+      // Optionally log or show fallback content
+      console.error('Fetch failed; returning offline fallback.', error);
+      return caches.match(`${BASE_PATH}/index.html`);
+    })
   );
 });
