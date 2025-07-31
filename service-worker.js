@@ -43,17 +43,17 @@ self.addEventListener('activate', event => {
 
 // FETCH: Serve from cache, or fetch and fallback
 self.addEventListener('fetch', event => {
-  const requestURL = new URL(event.request.url);
+  const url = new URL(event.request.url);
 
-  // Special case: match any version of studentview.html (with query strings)
-  if (requestURL.pathname.endsWith('/studentview.html')) {
+  // Special handling for studentview.html with query params
+  if (url.pathname.endsWith('/studentview.html')) {
     event.respondWith(
       caches.match(`${BASE_PATH}/studentview.html`).then(response => {
-        return response || fetch(event.request);
-      }).catch(async error => {
-        console.error('StudentView fetch failed:', error);
-        return new Response('Offline: studentview.html is unavailable.', {
+        return response || fetch(`${BASE_PATH}/studentview.html`);
+      }).catch(() => {
+        return new Response('Offline: studentview.html not available', {
           status: 503,
+          statusText: 'Service Unavailable',
           headers: { 'Content-Type': 'text/plain' }
         });
       })
@@ -61,22 +61,21 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Default fetch handler
+  // Default behavior
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
     }).catch(async error => {
       console.error('Fetch failed:', error);
-
       if (event.request.headers.get('accept')?.includes('text/html')) {
-        const fallback = await caches.match(`${BASE_PATH}/index.html`);
-        if (fallback) return fallback;
+        return await caches.match(`${BASE_PATH}/index.html`);
       }
-
       return new Response('You are offline and this resource is not cached.', {
         status: 503,
+        statusText: 'Service Unavailable',
         headers: { 'Content-Type': 'text/plain' }
       });
     })
   );
 });
+
