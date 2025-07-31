@@ -14,16 +14,22 @@ const urlsToCache = [
   `${BASE_PATH}/icon-512.png`
 ];
 
-// INSTALL
+// INSTALL: Cache all required assets
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .catch(err => console.error('Caching failed', err))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const url of urlsToCache) {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          console.error(`❌ Failed to cache: ${url}`, err);
+        }
+      }
+    })
   );
 });
 
-// ACTIVATE
+// ACTIVATE: Clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -32,9 +38,10 @@ self.addEventListener('activate', event => {
       )
     )
   );
+  self.clients.claim();
 });
 
-// FETCH
+// FETCH: Serve from cache, or fallback safely
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
@@ -42,19 +49,18 @@ self.addEventListener('fetch', event => {
     }).catch(async error => {
       console.error('Fetch failed:', error);
 
-      // Check if it's an HTML page request
+      // If this is an HTML request, return cached index.html if available
       if (event.request.headers.get('accept')?.includes('text/html')) {
         const fallback = await caches.match(`${BASE_PATH}/index.html`);
         if (fallback) return fallback;
       }
 
-      // Generic fallback Response
-      return new Response('Offline and resource not cached.', {
+      // Otherwise, return a valid offline text response
+      return new Response('You are offline and this resource is not cached.', {
         status: 503,
-        statusText: 'Offline',
+        statusText: 'Service Unavailable',
         headers: { 'Content-Type': 'text/plain' }
       });
     })
   );
 });
-
