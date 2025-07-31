@@ -45,37 +45,30 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Special handling for studentview.html with query params
+  // Match /studentview.html even with query parameters
   if (url.pathname.endsWith('/studentview.html')) {
     event.respondWith(
       caches.match(`${BASE_PATH}/studentview.html`).then(response => {
         return response || fetch(`${BASE_PATH}/studentview.html`);
-      }).catch(() => {
-        return new Response('Offline: studentview.html not available', {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: { 'Content-Type': 'text/plain' }
-        });
-      })
+      }).catch(() => new Response('Offline: studentview.html not cached', { status: 503 }))
     );
     return;
   }
 
-  // Default behavior
+  // Match /PaidPage.html even with query parameters
+  if (url.pathname.endsWith('/PaidPage.html')) {
+    event.respondWith(
+      caches.match(`${BASE_PATH}/PaidPage.html`).then(response => {
+        return response || fetch(`${BASE_PATH}/PaidPage.html`);
+      }).catch(() => new Response('Offline: PaidPage.html not cached', { status: 503 }))
+    );
+    return;
+  }
+
+  // Default: try cache, else network
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
-    }).catch(async error => {
-      console.error('Fetch failed:', error);
-      if (event.request.headers.get('accept')?.includes('text/html')) {
-        return await caches.match(`${BASE_PATH}/index.html`);
-      }
-      return new Response('You are offline and this resource is not cached.', {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'text/plain' }
-      });
-    })
+    }).catch(() => new Response('Offline: resource not cached', { status: 503 }))
   );
 });
-
