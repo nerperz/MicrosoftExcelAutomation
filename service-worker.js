@@ -41,45 +41,40 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-self.addEventListener('fetch', function(event) {
-  const url = new URL(event.request.url);
+// FETCH: Serve from cache, or fetch and fallback
+self.addEventListener('fetch', event => {
+  const requestURL = new URL(event.request.url);
 
-  // Handle requests to studentview.html with query params
-  if (url.pathname.endsWith('studentview.html')) {
+  // Special case: match any version of studentview.html (with query strings)
+  if (requestURL.pathname.endsWith('/studentview.html')) {
     event.respondWith(
-      caches.match('/studentview.html').then(function(response) {
+      caches.match(`${BASE_PATH}/studentview.html`).then(response => {
         return response || fetch(event.request);
+      }).catch(async error => {
+        console.error('StudentView fetch failed:', error);
+        return new Response('Offline: studentview.html is unavailable.', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       })
     );
     return;
   }
 
-  // Default handler
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-    })
-  );
-});
-
-// FETCH: Serve from cache, or fallback safely
-self.addEventListener('fetch', event => {
+  // Default fetch handler
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
     }).catch(async error => {
       console.error('Fetch failed:', error);
 
-      // If this is an HTML request, return cached index.html if available
       if (event.request.headers.get('accept')?.includes('text/html')) {
         const fallback = await caches.match(`${BASE_PATH}/index.html`);
         if (fallback) return fallback;
       }
 
-      // Otherwise, return a valid offline text response
       return new Response('You are offline and this resource is not cached.', {
         status: 503,
-        statusText: 'Service Unavailable',
         headers: { 'Content-Type': 'text/plain' }
       });
     })
